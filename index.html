@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceia do Chef - Pedidos Online</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 🎪 CONTAINER PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- 🏪 CABEÇALHO DA LOJA -->
+        <header class="store-header">
+            <div class="store-cover">
+                <div class="cover-content">
+                    <h1 class="store-title" id="storeName">Ceia do Chef</h1>
+                    <p class="store-subtitle">🎄 Natal 2024 • 🚀 Entrega Expressa</p>
+                </div>
+            </div>
+            
+            <div class="store-profile">
+                <div class="profile-avatar">
+                    <div class="avatar-img">👨‍🍳</div>
+                </div>
+                <div class="store-details">
+                    <div class="store-meta">
+                        <span class="rating">⭐⭐⭐⭐⭐ 4.9</span>
+                        <span class="delivery-time">🕒 15-30 min</span>
+                    </div>
+                    <p class="store-description">Ceias completas para seu Natal com amor e qualidade</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- 📱 BARRA DE INFORMAÇÕES -->
+        <div class="info-bar">
+            <div class="countdown" id="countdown">
+                ⏰ Faltam 26 dias para o Natal!
+            </div>
+            <div class="promo-banner">
+                🎁 Frete Grátis • 📞 Pedido pelo WhatsApp
+            </div>
+        </div>
+
+        <!-- 🔍 BARRA DE PESQUISA -->
+        <div class="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="productSearch" 
+                       placeholder="Buscar ceias, sobremesas, bebidas...">
+            </div>
+        </div>
+
+        <!-- 📂 CATEGORIAS HORIZONTAIS -->
+        <nav class="categories-nav">
+            <div class="categories-scroll">
+                <button class="category-tab active" data-category="all">
+                    <span class="tab-icon">🍽️</span>
+                    <span class="tab-label">Todos</span>
+                </button>
+                <button class="category-tab" data-category="ceia">
+                    <span class="tab-icon">🍗</span>
+                    <span class="tab-label">Ceias</span>
+                </button>
+                <button class="category-tab" data-category="sobremesa">
+                    <span class="tab-icon">🍰</span>
+                    <span class="tab-label">Sobremesas</span>
+                </button>
+                <button class="category-tab" data-category="bebida">
+                    <span class="tab-icon">🍷</span>
+                    <span class="tab-label">Bebidas</span>
+                </button>
+                <button class="category-tab" data-category="acompanhamento">
+                    <span class="tab-icon">🥘</span>
+                    <span class="tab-label">Acompanhamentos</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 🎪 PRODUTOS EM GRID ADAPTÁVEL -->
+        <main class="products-main">
+            <div class="products-grid" id="productsGrid">
+                <!-- Produtos serão carregados aqui via JavaScript -->
+            </div>
+            
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">🔍</div>
+                <h3>Nenhum produto encontrado</h3>
+                <p>Tente buscar com outras palavras ou mudar a categoria</p>
+                <button class="reset-filters" onclick="resetFilters()">Limpar Filtros</button>
+            </div>
+        </main>
+
+        <!-- 🛒 CARRINHO FLUTUANTE -->
+        <footer class="cart-footer">
+            <div class="floating-cart" id="floatingCart">
+                <div class="cart-preview">
+                    <span class="cart-count">0 itens</span>
+                    <span class="cart-total">R$ 0,00</span>
+                </div>
+                <button class="cart-toggle" onclick="toggleCartPanel()">
+                    Ver Carrinho
+                </button>
+            </div>
+        </footer>
+
+        <!-- 📦 PAINEL DO CARRINHO -->
+        <aside class="cart-panel" id="cartPanel">
+            <div class="panel-header">
+                <h3>🛒 Seu Pedido</h3>
+                <button class="panel-close" onclick="toggleCartPanel()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="panel-content">
+                <div class="cart-items" id="cartItems">
+                    <!-- Itens do carrinho -->
+                </div>
+                
+                <!-- 🎁 SEÇÃO DE CUPOM -->
+                <div class="coupon-section">
+                    <div class="coupon-input">
+                        <input type="text" id="couponCode" placeholder="Digite seu cupom...">
+                        <button id="applyCoupon">Aplicar</button>
+                    </div>
+                    <div class="coupon-feedback" id="couponFeedback"></div>
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotalPrice">R$ 0,00</span>
+                    </div>
+                    <div class="summary-row discount" id="discountRow">
+                        <span>Desconto</span>
+                        <span>- R$ 0,00</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="totalPrice">R$ 0,00</span>
+                    </div>
+                </div>
+                
+                <button class="checkout-btn" onclick="openCheckout()">
+                    Finalizar Pedido
+                </button>
+            </div>
+        </aside>
+
+        <!-- 📝 MODAL DE FINALIZAÇÃO -->
+        <div class="checkout-modal" id="checkoutModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📋 Confirmar Pedido</h3>
+                    <button class="modal-close" onclick="closeCheckout()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form class="checkout-form" id="checkoutForm">
+                    <div class="form-section">
+                        <h4>👤 Seus Dados</h4>
+                        <div class="form-group">
+                            <input type="text" id="customerName" placeholder="Nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="customerPhone" placeholder="WhatsApp" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4>📍 Entrega</h4>
+                        <div class="form-group">
+                            <input type="text" id="customerAddress" placeholder="Endereço completo" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="customerNotes" placeholder="Observações (opcional)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4>💳 Pagamento</h4>
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="pix" required>
+                                <span class="payment-label">
+                                    <span class="payment-icon">📱</span>
+                                    PIX
+                                </span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="cartao">
+                                <span class="payment-label">
+                                    <span class="payment-icon">💳</span>
+                                    Cartão
+                                </span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="dinheiro">
+                                <span class="payment-label">
+                                    <span class="payment-icon">💵</span>
+                                    Dinheiro
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-order">
+                        🎅 Enviar Pedido pelo WhatsApp
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="functions.js"></script>
+</body>
+</html>
