@@ -66,12 +66,68 @@ let order = {
 let activeCategory = 'all';
 let activeCoupon = null;
 
+// ===== SISTEMA DE PERSISTÊNCIA =====
+function saveOrderToLocalStorage() {
+    localStorage.setItem('ceiaChefOrder', JSON.stringify(order));
+    localStorage.setItem('ceiaChefActiveCategory', activeCategory);
+    localStorage.setItem('ceiaChefActiveCoupon', JSON.stringify(activeCoupon));
+}
+
+function loadOrderFromLocalStorage() {
+    const savedOrder = localStorage.getItem('ceiaChefOrder');
+    if (savedOrder) {
+        order = JSON.parse(savedOrder);
+    }
+
+    const savedCategory = localStorage.getItem('ceiaChefActiveCategory');
+    if (savedCategory) {
+        activeCategory = savedCategory;
+    }
+
+    const savedCoupon = localStorage.getItem('ceiaChefActiveCoupon');
+    if (savedCoupon) {
+        activeCoupon = JSON.parse(savedCoupon);
+    }
+}
+
+// ===== SISTEMA ADMINISTRATIVO =====
+function loadAdminSettingsFromLocalStorage() {
+    const savedSettings = localStorage.getItem('ceiaChefAdminSettings');
+    if (savedSettings) {
+        const adminSettings = JSON.parse(savedSettings);
+
+        // Aplicar configurações salvas
+        if (adminSettings.storeName) CONFIG.storeName = adminSettings.storeName;
+        if (adminSettings.whatsappNumber) CONFIG.whatsappNumber = adminSettings.whatsappNumber;
+        if (adminSettings.products) CONFIG.products = adminSettings.products;
+        if (adminSettings.coupons) {
+            // Mesclar cupons existentes com salvos
+            Object.assign(DISCOUNT_COUPONS, adminSettings.coupons);
+        }
+        if (adminSettings.theme) {
+            updateCSSVariables(adminSettings.theme);
+        }
+    }
+}
+
+function updateCSSVariables(theme) {
+    document.documentElement.style.setProperty('--primary', theme.primary);
+    document.documentElement.style.setProperty('--secondary', theme.secondary);
+    document.documentElement.style.setProperty('--accent', theme.accent);
+    document.documentElement.style.setProperty('--background', theme.background);
+}
+
+
+
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 Iniciando aplicação - Layout Horizontal");
+    loadOrderFromLocalStorage(); // Carregar estado salvo
+    loadAdminSettingsFromLocalStorage(); // Carregar configurações admin
     initializeApp();
     setupEventListeners();
     renderProducts();
+    updateCartUI(); // Atualizar UI com dados carregados
     updateCountdown();
 });
 
@@ -81,7 +137,7 @@ function initializeApp() {
     if (storeNameElement) {
         storeNameElement.textContent = CONFIG.storeName;
     }
-    
+
     console.log("✅ Aplicação inicializada");
 }
 
@@ -101,9 +157,9 @@ function renderProducts() {
                 <p class="product-description">${product.description}</p>
                 <div class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</div>
                 <div class="product-actions">
-                    <button class="quantity-btn minus" data-product="${product.id}">-</button>
-                    <span class="quantity-display" id="qty-${product.id}">0</span>
-                    <button class="quantity-btn plus" data-product="${product.id}">+</button>
+                    <button class="quantity-btn minus" data-product="${product.id}" onclick="updateQuantity('${product.id}', -1)">-</button>
+                    <span class="quantity-display" id="qty-${product.id}">${order.items[product.id] || 0}</span>
+                    <button class="quantity-btn plus" data-product="${product.id}" onclick="updateQuantity('${product.id}', 1)">+</button>
                 </div>
             </div>
         </div>
@@ -156,14 +212,7 @@ function setupCategoryListeners() {
 }
 
 function setupProductListeners() {
-    // Delegation para botões de quantidade
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('quantity-btn')) {
-            const productId = e.target.getAttribute('data-product');
-            const change = e.target.classList.contains('plus') ? 1 : -1;
-            updateQuantity(productId, change);
-        }
-    });
+    // Botões de quantidade agora usam onclick direto no HTML
 }
 
 function setupSearchListener() {
@@ -206,15 +255,16 @@ function setupCheckoutListeners() {
 // ===== SISTEMA DE CATEGORIAS =====
 function setActiveCategory(category) {
     activeCategory = category;
-    
+
     // Atualizar UI
     document.querySelectorAll('.category-tab').forEach(tab => {
         tab.classList.remove('active');
     });
     document.querySelector(`[data-category="${category}"]`).classList.add('active');
-    
+
     // Filtrar produtos
     filterProducts();
+    saveOrderToLocalStorage(); // Salvar estado
 }
 
 // ===== SISTEMA DE FILTROS =====
@@ -258,16 +308,17 @@ function resetFilters() {
 function updateQuantity(productId, change) {
     const currentQty = order.items[productId] || 0;
     const newQty = Math.max(0, currentQty + change);
-    
+
     order.items[productId] = newQty;
-    
+
     // Atualizar display
     const qtyDisplay = document.getElementById(`qty-${productId}`);
     if (qtyDisplay) {
         qtyDisplay.textContent = newQty;
     }
-    
+
     updateCartUI();
+    saveOrderToLocalStorage(); // Salvar estado
     console.log(`🔄 ${productId}: ${newQty} unidades`);
 }
 
@@ -388,26 +439,28 @@ function closeCheckout() {
 function applyCoupon() {
     const couponInput = document.getElementById('couponCode');
     const feedbackElement = document.getElementById('couponFeedback');
-    
+
     if (!couponInput || !feedbackElement) return;
-    
+
     const couponCode = couponInput.value.trim().toUpperCase();
-    
+
     if (!couponCode) {
         showCouponFeedback('❌ Digite um código de cupom', 'error');
         return;
     }
-    
+
     const coupon = DISCOUNT_COUPONS[couponCode];
-    
+
     if (coupon && coupon.valid) {
         activeCoupon = coupon;
         showCouponFeedback(`✅ Cupom aplicado! ${coupon.discount}% de desconto`, 'success');
         updateCartUI();
+        saveOrderToLocalStorage(); // Salvar estado
     } else {
         activeCoupon = null;
         showCouponFeedback('❌ Cupom inválido ou expirado', 'error');
         updateCartUI();
+        saveOrderToLocalStorage(); // Salvar estado
     }
 }
 
@@ -539,15 +592,16 @@ function resetOrder() {
     order.customerInfo = {};
     order.totalAmount = 0;
     activeCoupon = null;
-    
+
     // Resetar UI
     document.querySelectorAll('.quantity-display').forEach(display => {
         display.textContent = '0';
     });
-    
+
     updateCartUI();
     closeCheckout();
-    
+    saveOrderToLocalStorage(); // Salvar estado resetado
+
     console.log("🔄 Pedido resetado");
 }
 
@@ -566,5 +620,86 @@ function updateCountdown() {
 
 // Atualizar contador a cada minuto
 setInterval(updateCountdown, 60000);
+
+// ===== SISTEMA DE AUTENTICAÇÃO =====
+
+// Verificar acesso ao painel admin
+async function checkAdminAccess(event) {
+    event.preventDefault();
+
+    try {
+        const response = await fetch('/api/auth-status');
+        const data = await response.json();
+
+        if (data.authenticated) {
+            window.location.href = '/admin';
+        } else {
+            window.location.href = '/login';
+        }
+    } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+        window.location.href = '/login';
+    }
+}
+
+// Carregar status de autenticação na página inicial
+async function loadAuthStatus() {
+    try {
+        const response = await fetch('/api/auth-status');
+        const data = await response.json();
+
+        const authStatus = document.getElementById('authStatus');
+        if (authStatus) {
+            if (data.authenticated) {
+                authStatus.innerHTML = `
+                    <div class="auth-info">
+                        <span class="auth-user">👤 ${data.user.username}</span>
+                        <button onclick="logout()" class="logout-btn-small">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </button>
+                    </div>
+                `;
+            } else {
+                authStatus.innerHTML = `
+                    <div class="auth-info">
+                        <a href="/login" class="login-link">
+                            <i class="fas fa-sign-in-alt"></i> Admin
+                        </a>
+                    </div>
+                `;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar status de autenticação:', error);
+    }
+}
+
+// Função de logout
+async function logout() {
+    try {
+        const response = await fetch('/logout', { method: 'GET' });
+        if (response.ok) {
+            window.location.href = '/';
+        }
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+    }
+}
+
+// Carregar status de autenticação quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    // Carregar outras inicializações existentes
+    console.log("🚀 Iniciando aplicação - Layout Horizontal");
+    loadOrderFromLocalStorage(); // Carregar estado salvo
+    loadAdminSettingsFromLocalStorage(); // Carregar configurações admin
+    initializeApp();
+    setupEventListeners();
+    renderProducts();
+    updateCartUI(); // Atualizar UI com dados carregados
+    updateCountdown();
+
+    // Carregar status de autenticação
+    loadAuthStatus();
+});
 
 console.log("🔧 functions.js carregado e pronto!");

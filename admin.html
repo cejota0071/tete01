@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Ceia do Chef</title>
+    <link rel="stylesheet" href="./assets/adminstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 🏪 CABEÇALHO DO PAINEL ADMIN -->
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <div class="admin-logo">
+                <i class="fas fa-cog"></i>
+                <h1>Painel Administrativo</h1>
+            </div>
+            <div class="admin-actions">
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair
+                </button>
+                <button onclick="window.location.href='index.html'" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar à Loja
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 📋 CONTEÚDO PRINCIPAL DO ADMIN -->
+    <main class="admin-main">
+        <div class="admin-container">
+            <!-- 🔍 BARRA DE NAVEGAÇÃO DAS ABAS -->
+            <nav class="admin-nav">
+                <button class="admin-nav-tab active" data-tab="store">
+                    <i class="fas fa-store"></i>
+                    <span>Loja</span>
+                </button>
+                <button class="admin-nav-tab" data-tab="products">
+                    <i class="fas fa-box"></i>
+                    <span>Produtos</span>
+                </button>
+                <button class="admin-nav-tab" data-tab="whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </button>
+                <button class="admin-nav-tab" data-tab="coupons">
+                    <i class="fas fa-tags"></i>
+                    <span>Cupons</span>
+                </button>
+                <button class="admin-nav-tab" data-tab="theme">
+                    <i class="fas fa-palette"></i>
+                    <span>Tema</span>
+                </button>
+                <button class="admin-nav-tab" data-tab="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Relatórios</span>
+                </button>
+            </nav>
+
+            <!-- 📄 CONTEÚDO DAS ABAS -->
+            <div class="admin-content">
+                <!-- ABA LOJA -->
+                <div id="store-tab" class="admin-tab-content active">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-store"></i> Configurações da Loja</h2>
+                        <p>Gerencie as informações básicas do seu negócio</p>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <div class="setting-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label for="adminStoreName">Nome do Negócio</label>
+                                <input type="text" id="adminStoreName" placeholder="Ex: Ceia do Chef">
+                                <small>Este nome aparecerá no cabeçalho da loja</small>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <div class="setting-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label for="adminCoverImage">URL da Imagem da Capa</label>
+                                <input type="url" id="adminCoverImage" placeholder="https://exemplo.com/capa.jpg">
+                                <small>Imagem que aparece no fundo do cabeçalho</small>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <div class="setting-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label for="adminProfileImage">URL da Imagem do Perfil</label>
+                                <input type="url" id="adminProfileImage" placeholder="https://exemplo.com/perfil.jpg">
+                                <small>Imagem circular do perfil da loja</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="save-section">
+                        <button onclick="updateStoreSettings()" class="save-btn">
+                            <i class="fas fa-save"></i>
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ABA PRODUTOS -->
+                <div id="products-tab" class="admin-tab-content">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-box"></i> Gerenciar Produtos</h2>
+                        <p>Edite preços e imagens dos seus produtos</p>
+                    </div>
+
+                    <div id="adminProductsList" class="products-admin-grid">
+                        <!-- Produtos serão carregados aqui -->
+                    </div>
+                </div>
+
+                <!-- ABA WHATSAPP -->
+                <div id="whatsapp-tab" class="admin-tab-content">
+                    <div class="tab-header">
+                        <h2><i class="fab fa-whatsapp"></i> Configuração do WhatsApp</h2>
+                        <p>Configure o número para receber pedidos</p>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="setting-card full-width">
+                            <div class="setting-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label for="adminWhatsappNumber">Número do WhatsApp</label>
+                                <input type="text" id="adminWhatsappNumber" placeholder="5534999999999">
+                                <small>Inclua o código do país (55) + DDD + número</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="save-section">
+                        <button onclick="updateWhatsappNumber()" class="save-btn">
+                            <i class="fas fa-save"></i>
+                            Salvar Número
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ABA CUPONS -->
+                <div id="coupons-tab" class="admin-tab-content">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-tags"></i> Sistema de Cupons</h2>
+                        <p>Crie e gerencie cupons de desconto</p>
+                    </div>
+
+                    <div class="coupon-creator">
+                        <h3>Criar Novo Cupom</h3>
+                        <div class="coupon-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="newCouponCode">Código do Cupom</label>
+                                    <input type="text" id="newCouponCode" placeholder="NATAL20" style="text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newCouponDiscount">Desconto (%)</label>
+                                    <input type="number" id="newCouponDiscount" placeholder="20" min="1" max="100">
+                                </div>
+                            </div>
+                            <button onclick="addNewCoupon()" class="create-btn">
+                                <i class="fas fa-plus"></i>
+                                Criar Cupom
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="current-coupons">
+                        <h3>Cupons Ativos</h3>
+                        <div id="currentCoupons" class="coupons-list">
+                            <!-- Cupons serão carregados aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA TEMA -->
+                <div id="theme-tab" class="admin-tab-content">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-palette"></i> Personalizar Tema</h2>
+                        <p>Altere as cores da sua loja</p>
+                    </div>
+
+                    <div class="theme-preview">
+                        <div class="preview-card">
+                            <div class="preview-header" style="background: var(--primary);">
+                                <h4>Exemplo de Tema</h4>
+                            </div>
+                            <div class="preview-content">
+                                <button style="background: var(--accent); color: white;">Botão de Exemplo</button>
+                                <p style="color: var(--text);">Texto de exemplo com as cores selecionadas.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="color-settings">
+                        <div class="color-grid">
+                            <div class="color-setting">
+                                <label for="adminPrimaryColor">
+                                    <span class="color-label">Cor Primária</span>
+                                    <input type="color" id="adminPrimaryColor" value="#d32f2f">
+                                </label>
+                            </div>
+                            <div class="color-setting">
+                                <label for="adminSecondaryColor">
+                                    <span class="color-label">Cor Secundária</span>
+                                    <input type="color" id="adminSecondaryColor" value="#2e7d32">
+                                </label>
+                            </div>
+                            <div class="color-setting">
+                                <label for="adminAccentColor">
+                                    <span class="color-label">Cor de Destaque</span>
+                                    <input type="color" id="adminAccentColor" value="#ffd700">
+                                </label>
+                            </div>
+                            <div class="color-setting">
+                                <label for="adminBackgroundColor">
+                                    <span class="color-label">Cor de Fundo</span>
+                                    <input type="color" id="adminBackgroundColor" value="#ffffff">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="save-section">
+                        <button onclick="updateThemeColors()" class="save-btn">
+                            <i class="fas fa-save"></i>
+                            Aplicar Tema
+                        </button>
+                        <button onclick="resetTheme()" class="reset-btn">
+                            <i class="fas fa-undo"></i>
+                            Restaurar Padrão
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ABA RELATÓRIOS -->
+                <div id="reports-tab" class="admin-tab-content">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-chart-bar"></i> Relatórios</h2>
+                        <p>Visualize estatísticas e relatórios da sua loja</p>
+                    </div>
+
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="report-content">
+                                <h3>Vendas Totais</h3>
+                                <div class="report-value" id="totalSales">R$ 0,00</div>
+                                <small>Valor total de vendas</small>
+                            </div>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="report-content">
+                                <h3>Produtos Vendidos</h3>
+                                <div class="report-value" id="totalProductsSold">0</div>
+                                <small>Unidades vendidas</small>
+                            </div>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="report-content">
+                                <h3>Pedidos Realizados</h3>
+                                <div class="report-value" id="totalOrders">0</div>
+                                <small>Número de pedidos</small>
+                            </div>
+                        </div>
+
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="report-content">
+                                <h3>Produto Mais Vendido</h3>
+                                <div class="report-value" id="topProduct">Nenhum</div>
+                                <small>Produto mais popular</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-section">
+                        <h3>Pedidos Recentes</h3>
+                        <div id="recentOrders" class="recent-orders-list">
+                            <!-- Pedidos recentes serão carregados aqui -->
+                        </div>
+                    </div>
+
+                    <div class="reports-section">
+                        <h3>Produtos Mais Vendidos</h3>
+                        <div id="popularProducts" class="popular-products-list">
+                            <!-- Produtos populares serão carregados aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 📢 NOTIFICAÇÕES -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationText"></span>
+        </div>
+    </div>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyB0RZpLDscY8zt38i6lBe2zBA_BuYAxVr4",
+        authDomain: "agendaudi-c2eb7.firebaseapp.com",
+        projectId: "agendaudi-c2eb7",
+        storageBucket: "agendaudi-c2eb7.firebasestorage.app",
+        messagingSenderId: "721139397608",
+        appId: "1:721139397608:web:9dca1b4eb10635d9146a5d",
+        measurementId: "G-8Q19BE74J1"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
+    <script src="admin.js"></script>
+</body>
+</html>

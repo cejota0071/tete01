@@ -16,8 +16,11 @@
             <div class="store-cover">
                 <div class="cover-content">
                     <h1 class="store-title" id="storeName">Ceia do Chef</h1>
-                    <p class="store-subtitle">🎄 Natal 2024 • 🚀 Entrega Expressa</p>
+                    <p class="store-subtitle"> 🚀 Entrega Expressa</p>
                 </div>
+                <a href="#" onclick="checkAdminAccess(event)" class="admin-btn" title="Painel Administrativo">
+                    <i class="fas fa-cog"></i>
+                </a>
             </div>
             
             <div class="store-profile">
@@ -30,6 +33,13 @@
                         <span class="delivery-time">🕒 15-30 min</span>
                     </div>
                     <p class="store-description">Ceias completas para seu Natal com amor e qualidade</p>
+                </div>
+            </div>
+
+            <!-- 🔐 AUTENTICAÇÃO -->
+            <div class="auth-section" id="authSection">
+                <div class="auth-status" id="authStatus">
+                    <!-- Status de autenticação será carregado aqui -->
                 </div>
             </div>
         </header>
