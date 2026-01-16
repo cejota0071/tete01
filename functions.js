@@ -1,9 +1,15 @@
-// functions.js - VERSÃO REFATORADA PARA LAYOUT HORIZONTAL CLEAN
+ // functions.js - VERSÃO REFATORADA PARA LAYOUT HORIZONTAL CLEAN
 
 // ===== CONFIGURAÇÕES GLOBAIS =====
 const CONFIG = {
     storeName: "Ceia do Chef",
     whatsappNumber: "5534991400189",
+    defaultCategories: {
+        'ceia': 'Ceias',
+        'sobremesa': 'Sobremesas',
+        'bebida': 'Bebidas',
+        'acompanhamento': 'Acompanhamentos'
+    },
     products: [
         {
             id: "product1",
@@ -14,7 +20,7 @@ const CONFIG = {
             popular: true
         },
         {
-            id: "product2", 
+            id: "product2",
             name: "Ceia Família",
             price: 159.90,
             description: "Para 4 pessoas • Chester, Farofa, Arroz, Salada",
@@ -23,7 +29,7 @@ const CONFIG = {
         },
         {
             id: "product3",
-            name: "Kit Sobremesas", 
+            name: "Kit Sobremesas",
             price: 79.90,
             description: "Panetone, Rabanada, Pudim, Sorvete • Complemente sua ceia",
             category: "sobremesa",
@@ -31,7 +37,7 @@ const CONFIG = {
         },
         {
             id: "product4",
-            name: "Vinho Tinto Premium", 
+            name: "Vinho Tinto Premium",
             price: 45.90,
             description: "Vinho tinto seco • Garrafa 750ml • Safra 2022",
             category: "bebida",
@@ -39,7 +45,7 @@ const CONFIG = {
         },
         {
             id: "product5",
-            name: "Farofa Especial", 
+            name: "Farofa Especial",
             price: 35.90,
             description: "Bacon, calabresa, passas • Pacote 500g • 6 pessoas",
             category: "acompanhamento",
@@ -47,6 +53,72 @@ const CONFIG = {
         }
     ]
 };
+
+// ===== SISTEMA DE CATEGORIAS =====
+let storeCategories = {};
+
+function getAllCategories() {
+    // Combinar categorias padrão com personalizadas
+    const allCategories = { ...CONFIG.defaultCategories };
+
+    // Adicionar categorias personalizadas do admin
+    if (storeCategories && typeof storeCategories === 'object') {
+        Object.assign(allCategories, storeCategories);
+    }
+
+    return allCategories;
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'ceia': '🍗',
+        'sobremesa': '🍰',
+        'bebida': '🍷',
+        'acompanhamento': '🥘',
+        'all': '🍽️'
+    };
+    return icons[category] || '📦';
+}
+
+function getCategoryName(category) {
+    if (category === 'all') return 'Todos';
+
+    const allCategories = getAllCategories();
+    return allCategories[category] || category;
+}
+
+// ===== RENDERIZAÇÃO DINÂMICA DE CATEGORIAS =====
+function loadCategories() {
+    const categoriesContainer = document.getElementById('categoriesContainer');
+    if (!categoriesContainer) return;
+
+    const allCategories = getAllCategories();
+
+    // Adicionar categoria "Todos" primeiro
+    let categoriesHTML = `
+        <button class="category-tab active" data-category="all">
+            <span class="tab-icon">${getCategoryIcon('all')}</span>
+            <span class="tab-label">${getCategoryName('all')}</span>
+        </button>
+    `;
+
+    // Adicionar categorias dinâmicas
+    Object.keys(allCategories).forEach(categoryKey => {
+        categoriesHTML += `
+            <button class="category-tab" data-category="${categoryKey}">
+                <span class="tab-icon">${getCategoryIcon(categoryKey)}</span>
+                <span class="tab-label">${allCategories[categoryKey]}</span>
+            </button>
+        `;
+    });
+
+    categoriesContainer.innerHTML = categoriesHTML;
+
+    // Reconfigurar event listeners para as novas categorias
+    setupCategoryListeners();
+
+    console.log("📂 Categorias carregadas dinamicamente");
+}
 
 // ===== SISTEMA DE CUPONS =====
 const DISCOUNT_COUPONS = {
@@ -92,21 +164,77 @@ function loadOrderFromLocalStorage() {
 
 // ===== SISTEMA ADMINISTRATIVO =====
 function loadAdminSettingsFromLocalStorage() {
+    // Carregar configurações do admin (chave principal)
+    const savedAdminConfig = localStorage.getItem('adminConfig');
+    if (savedAdminConfig) {
+        const adminConfig = JSON.parse(savedAdminConfig);
+
+        // Aplicar configurações do admin
+        if (adminConfig.storeName) CONFIG.storeName = adminConfig.storeName;
+        if (adminConfig.whatsappNumber) CONFIG.whatsappNumber = adminConfig.whatsappNumber;
+        if (adminConfig.products && adminConfig.products.length > 0) CONFIG.products = adminConfig.products;
+    }
+
+    // Carregar configurações adicionais (compatibilidade)
     const savedSettings = localStorage.getItem('ceiaChefAdminSettings');
     if (savedSettings) {
         const adminSettings = JSON.parse(savedSettings);
 
-        // Aplicar configurações salvas
-        if (adminSettings.storeName) CONFIG.storeName = adminSettings.storeName;
-        if (adminSettings.whatsappNumber) CONFIG.whatsappNumber = adminSettings.whatsappNumber;
-        if (adminSettings.products) CONFIG.products = adminSettings.products;
+        // Aplicar configurações adicionais (não sobrescrever produtos se já carregados do adminConfig)
+        if (!CONFIG.products.length && adminSettings.products && adminSettings.products.length > 0) {
+            CONFIG.products = adminSettings.products;
+        }
         if (adminSettings.coupons) {
-            // Mesclar cupons existentes com salvos
+            // Mesclar cupons existentes com salvos (não sobrescrever completamente)
             Object.assign(DISCOUNT_COUPONS, adminSettings.coupons);
         }
         if (adminSettings.theme) {
             updateCSSVariables(adminSettings.theme);
         }
+
+        // Aplicar configurações visuais na página principal
+        applyAdminSettingsToUI(adminSettings);
+    }
+
+    // Atualizar nome da loja após carregar configurações
+    const storeNameElement = document.getElementById('storeName');
+    if (storeNameElement) {
+        storeNameElement.textContent = CONFIG.storeName;
+    }
+}
+
+function applyAdminSettingsToUI(settings) {
+    // Aplicar nome da loja
+    const storeNameElement = document.getElementById('storeName');
+    if (storeNameElement && settings.storeName) {
+        storeNameElement.textContent = settings.storeName;
+    }
+
+    // Aplicar imagem de capa
+    if (settings.coverImage) {
+        const storeCover = document.querySelector('.store-cover');
+        if (storeCover) {
+            storeCover.style.backgroundImage = `url('${settings.coverImage}')`;
+            storeCover.style.backgroundSize = 'cover';
+            storeCover.style.backgroundPosition = 'center';
+        }
+    }
+
+    // Aplicar imagem de perfil
+    if (settings.profileImage) {
+        const profileAvatar = document.querySelector('.profile-avatar .avatar-img');
+        if (profileAvatar) {
+            profileAvatar.innerHTML = `<img src="${settings.profileImage}" alt="Perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        }
+    }
+
+    // Aplicar cores do tema
+    if (settings.primaryColor || settings.secondaryColor || settings.accentColor || settings.backgroundColor) {
+        const root = document.documentElement;
+        if (settings.primaryColor) root.style.setProperty('--primary', settings.primaryColor);
+        if (settings.secondaryColor) root.style.setProperty('--secondary', settings.secondaryColor);
+        if (settings.accentColor) root.style.setProperty('--accent', settings.accentColor);
+        if (settings.backgroundColor) root.style.setProperty('--background', settings.backgroundColor);
     }
 }
 
@@ -138,6 +266,9 @@ function initializeApp() {
         storeNameElement.textContent = CONFIG.storeName;
     }
 
+    // Carregar categorias dinamicamente
+    loadCategories();
+
     console.log("✅ Aplicação inicializada");
 }
 
@@ -149,7 +280,8 @@ function renderProducts() {
     productsGrid.innerHTML = CONFIG.products.map(product => `
         <div class="product-card" data-category="${product.category}" data-product-id="${product.id}">
             <div class="product-image">
-                <div class="img-placeholder">${getProductIcon(product.category)}</div>
+                ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ''}
+                <div class="img-placeholder" ${product.image ? 'style="display: none;"' : ''}>${getProductIcon(product.category)}</div>
                 ${product.popular ? '<div class="product-badge">🔥 Mais Vendido</div>' : ''}
             </div>
             <div class="product-content">
@@ -700,6 +832,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Carregar status de autenticação
     loadAuthStatus();
+
+    // Limpar dados sensíveis do localStorage após uso (opcional - para maior segurança)
+    // localStorage.removeItem('cart');
+    // localStorage.removeItem('orderData');
 });
 
 console.log("🔧 functions.js carregado e pronto!");
