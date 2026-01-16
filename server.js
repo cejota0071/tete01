@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const database = require('./database');
+const config = require('./config');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,15 +13,7 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(session({
-    secret: 'ceia-chef-admin-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // Set to true in production with HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-}));
+app.use(session(config.session));
 
 // Serve static files
 app.use(express.static(path.join(__dirname)));
@@ -90,12 +83,23 @@ app.get('/api/auth-status', (req, res) => {
     }
 });
 
+// API endpoint to get Firebase config (server-side only)
+app.get('/api/firebase-config', (req, res) => {
+    // Only return config if user is authenticated
+    if (req.session.user) {
+        res.json(config.firebase);
+    } else {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+});
+
+// Initialize database with config path
+database.init(config.database.path);
+
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log('Default admin credentials:');
-    console.log('Username: admin');
-    console.log('Password: admin123');
+    console.log(`Server running on http://localhost:${PORT} (${config.server.env} mode)`);
+    console.log('Database initialized at:', config.database.path);
 });
 
 // Graceful shutdown
