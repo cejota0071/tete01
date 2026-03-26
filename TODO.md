@@ -1,22 +1,20 @@
-# API Key Security Improvements
+# QG Marmitas - Task Progress
 
-## Current Status
-- [x] Analyzed exposed API keys and credentials
-- [x] Identified security vulnerabilities
+## ✅ Completed:
+- [x] Restyled index.html modern layout (flip cards, sidebar cart, schedule toggle, status legend)
+- [x] Added img/capa.png to hero background
+- [x] Secured admin toggle with checkAdminAccess (requires /login → /admin)
+- [x] Server localhost:3000 running (nodemon dev, DB admin.db)
+- [x] PWA tags preserved
 
-## Planned Improvements
-- [x] Create .env file with environment variables
-- [x] Update config.js to use environment variables
-- [x] Update server.js to remove credential logging
-- [x] Improve Firebase config endpoint security
-- [x] Add .env to .gitignore
-- [x] Create .env.example for documentation
-- [x] Test application functionality (tests run but require DOM mocking improvements for full coverage)
+## 🔄 Next Steps:
+1. Test: localhost:3000 products render, cart add, schedule, WhatsApp
+2. Login: localhost:3000/login (admin / Ju#l1orr@20@) → /admin status panel
+3. Deploy HTTPS production
 
-## Issues Found
-1. Firebase config with dummy API key in config.js
-2. Default credentials logged in server.js console
-3. Session secret hardcoded in config.js
-4. Firebase config exposed via API endpoint
-5. Sensitive data in localStorage
-6. No environment variable usage
+## Issues Fixed:
+- Port 3000 conflicts (taskkill PID)
+- JS conflicts (old functions.js conditioned)
+- Admin protected (server session)
+
+**Ready for testing!**

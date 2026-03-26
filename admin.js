@@ -2,7 +2,7 @@
 
 // ===== CONFIGURAÇÕES GLOBAIS DO ADMIN =====
 let ADMIN_CONFIG = {
-    storeName: "Ceia do Chef",
+    storeName: "QG Marmitas",
     whatsappNumber: "5534991400189",
     products: [
         {

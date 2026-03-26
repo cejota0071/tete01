@@ -2,7 +2,7 @@
 
 // ===== CONFIGURAÇÕES GLOBAIS =====
 const CONFIG = {
-    storeName: "Ceia do Chef",
+    storeName: "QG Marmitas",
     whatsappNumber: "5534991400189",
     defaultCategories: {
         'ceia': 'Ceias',
