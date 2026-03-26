@@ -6,8 +6,19 @@
     <title>Painel Administrativo - Ceia do Chef</title>
     <link rel="stylesheet" href="./assets/adminstyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-W9JZRLDJ');</script>
+<!-- End Google Tag Manager -->
 </head>
 <body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W9JZRLDJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <!-- 🏪 CABEÇALHO DO PAINEL ADMIN -->
     <header class="admin-header">
         <div class="admin-header-content">
@@ -115,11 +126,26 @@
                 <div id="products-tab" class="admin-tab-content">
                     <div class="tab-header">
                         <h2><i class="fas fa-box"></i> Gerenciar Produtos</h2>
-                        <p>Edite preços e imagens dos seus produtos</p>
+                        <p>Adicione, edite e remova produtos da sua loja</p>
                     </div>
 
-                    <div id="adminProductsList" class="products-admin-grid">
-                        <!-- Produtos serão carregados aqui -->
+                    <!-- Criar Novo Produto -->
+                    <div class="product-creator">
+                        <div class="creator-header">
+                            <h3><i class="fas fa-plus-circle"></i> Gerenciar Produtos</h3>
+                            <button onclick="openAddProductModal()" class="create-btn">
+                                <i class="fas fa-plus"></i>
+                                Adicionar Produto
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Produtos -->
+                    <div class="products-section">
+                        <h3><i class="fas fa-list"></i> Produtos Cadastrados</h3>
+                        <div id="adminProductsList" class="products-admin-grid">
+                            <!-- Produtos serão carregados aqui -->
+                        </div>
                     </div>
                 </div>
 
@@ -250,6 +276,12 @@
                 <div id="reports-tab" class="admin-tab-content">
                     <div class="tab-header">
                         <h2><i class="fas fa-chart-bar"></i> Relatórios</h2>
+                        <div class="tab-actions">
+                            <button onclick="generateReportCard()" class="generate-report-btn">
+                                <i class="fas fa-file-pdf"></i>
+                                Gerar Relatório
+                            </button>
+                        </div>
                         <p>Visualize estatísticas e relatórios da sua loja</p>
                     </div>
 
@@ -325,29 +357,152 @@
         </div>
     </div>
 
+    <!-- MODAL PARA ADICIONAR PRODUTO -->
+    <div id="addProductModal" class="admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Adicionar Novo Produto</h3>
+                <button onclick="closeModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalProductName">Nome do Produto *</label>
+                        <input type="text" id="modalProductName" placeholder="Ex: Ceia Completa Premium">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalProductPrice">Preço (R$) *</label>
+                        <input type="number" id="modalProductPrice" step="0.01" placeholder="299.90">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalProductCategory">Categoria</label>
+                        <div class="category-input-group">
+                            <select id="modalProductCategory">
+                                <option value="ceia">Ceia</option>
+                                <option value="sobremesa">Sobremesa</option>
+                                <option value="bebida">Bebida</option>
+                                <option value="acompanhamento">Acompanhamento</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                            <button type="button" onclick="openCategoryManager()" class="category-manage-btn" title="Gerenciar Categorias">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="modalProductDescription">Descrição</label>
+                        <textarea id="modalProductDescription" placeholder="Descreva o produto detalhadamente..."></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalProductImage">URL da Imagem</label>
+                        <input type="url" id="modalProductImage" placeholder="https://exemplo.com/imagem.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalProductIcon">Ícone SVG (opcional)</label>
+                        <input type="url" id="modalProductIcon" placeholder="https://exemplo.com/icone.svg">
+                        <small>Link para ícone SVG personalizado</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalProductPopular">Produto Popular</label>
+                        <input type="checkbox" id="modalProductPopular">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn-secondary">Cancelar</button>
+                <button onclick="saveNewProduct()" class="btn-primary">Adicionar Produto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA GERENCIAR CATEGORIAS -->
+    <div id="categoryManagerModal" class="admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-tags"></i> Gerenciar Categorias</h3>
+                <button onclick="closeCategoryManager()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-manager-section">
+                    <div class="add-category-form">
+                        <h4>Adicionar Nova Categoria</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newCategoryName">Nome da Categoria</label>
+                                <input type="text" id="newCategoryName" placeholder="Ex: Entradas">
+                            </div>
+                            <div class="form-group">
+                                <label for="newCategoryValue">Valor (slug)</label>
+                                <input type="text" id="newCategoryValue" placeholder="entradas">
+                                <small>Valor único para identificação (sem espaços)</small>
+                            </div>
+                        </div>
+                        <button onclick="addNewCategory()" class="create-btn">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Categoria
+                        </button>
+                    </div>
+
+                    <div class="existing-categories">
+                        <h4>Categorias Existentes</h4>
+                        <div id="categoriesList" class="categories-list">
+                            <!-- Categorias serão carregadas aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeCategoryManager()" class="btn-secondary">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
 
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-      const firebaseConfig = {
-        apiKey: "AIzaSyB0RZpLDscY8zt38i6lBe2zBA_BuYAxVr4",
-        authDomain: "agendaudi-c2eb7.firebaseapp.com",
-        projectId: "agendaudi-c2eb7",
-        storageBucket: "agendaudi-c2eb7.firebasestorage.app",
-        messagingSenderId: "721139397608",
-        appId: "1:721139397608:web:9dca1b4eb10635d9146a5d",
-        measurementId: "G-8Q19BE74J1"
-      };
+      // Initialize Firebase with server-provided config
+      async function initializeFirebaseSecurely() {
+        try {
+          // Fetch Firebase config from server (requires authentication)
+          const response = await fetch('/api/firebase-config');
 
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
+          if (!response.ok) {
+            throw new Error('Failed to load Firebase configuration');
+          }
+
+          const firebaseConfig = await response.json();
+
+          // Initialize Firebase with secure config
+          const app = initializeApp(firebaseConfig);
+          const analytics = getAnalytics(app);
+
+          console.log('Firebase initialized securely from server config');
+          return { app, analytics };
+        } catch (error) {
+          console.error('Firebase initialization failed:', error);
+          // Show user-friendly error message
+          showNotification('Erro ao conectar com serviços externos. Alguns recursos podem não funcionar.', 'error');
+          return null;
+        }
+      }
+
+      // Initialize Firebase when page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeFirebaseSecurely();
+      });
     </script>
     <script src="admin.js"></script>
+    <script>
+        // Initialize admin page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAdminPage();
+        });
+    </script>
 </body>
 </html>

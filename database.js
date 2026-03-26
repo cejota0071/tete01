@@ -3,17 +3,26 @@ const bcrypt = require('bcrypt');
 
 class Database {
     constructor() {
-        this.db = new sqlite3.Database('./admin.db', (err) => {
+        this.db = null;
+    }
+
+    init(dbPath = './admin.db') {
+        if (this.db) {
+            console.log('Database already initialized');
+            return;
+        }
+
+        this.db = new sqlite3.Database(dbPath, (err) => {
             if (err) {
                 console.error('Error opening database:', err.message);
             } else {
-                console.log('Connected to SQLite database.');
-                this.init();
+                console.log('Connected to SQLite database at:', dbPath);
+                this.initializeTables();
             }
         });
     }
 
-    async init() {
+    async initializeTables() {
         try {
             // Create users table
             await this.run(`
@@ -29,12 +38,11 @@ class Database {
             const existingAdmin = await this.get('SELECT * FROM users WHERE username = ?', ['admin']);
 
             if (!existingAdmin) {
-                // Create default admin user
-                const hashedPassword = await bcrypt.hash('admin123', 10);
-                await this.run('INSERT INTO users (username, password_hash) VALUES (?, ?)', ['admin', hashedPassword]);
-                console.log('Default admin user created:');
-                console.log('Username: admin');
-                console.log('Password: admin123');
+                // Create default admin user using config values
+                const config = require('./config');
+                const hashedPassword = await bcrypt.hash(config.admin.defaultPassword, 10);
+                await this.run('INSERT INTO users (username, password_hash) VALUES (?, ?)', [config.admin.defaultUsername, hashedPassword]);
+                console.log('Default admin user created with credentials from config');
             }
         } catch (error) {
             console.error('Database initialization error:', error);

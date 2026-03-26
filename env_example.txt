@@ -1,0 +1,23 @@
+# Copy this file to .env and fill in your actual values
+
+# Session Configuration
+SESSION_SECRET=your-secure-random-session-secret-here
+
+# Firebase Configuration (get these from Firebase Console)
+FIREBASE_API_KEY=your-firebase-api-key-here
+FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+FIREBASE_APP_ID=your-app-id
+
+# Database Configuration
+DB_PATH=./admin.db
+
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# Admin Default Credentials (change these in production!)
+DEFAULT_ADMIN_USERNAME=admin
+DEFAULT_ADMIN_PASSWORD=change-this-password

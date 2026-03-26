@@ -7,7 +7,7 @@ const database = require('./database');
 const config = require('./config');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -44,16 +44,20 @@ app.post('/login', async (req, res) => {
 
     try {
         const user = await database.authenticateUser(username, password);
+
         if (user) {
             req.session.user = user;
             res.redirect('/admin');
         } else {
-            res.send(`
-                <script>
-                    alert('Credenciais inválidas!');
-                    window.location.href = '/login';
-                </script>
-            `);
+            // Add delay to prevent brute force attacks
+            setTimeout(() => {
+                res.send(`
+                    <script>
+                        alert('Credenciais inválidas!');
+                        window.location.href = '/login';
+                    </script>
+                `);
+            }, 1000);
         }
     } catch (error) {
         console.error('Login error:', error);
@@ -85,9 +89,14 @@ app.get('/api/auth-status', (req, res) => {
 
 // API endpoint to get Firebase config (server-side only)
 app.get('/api/firebase-config', (req, res) => {
-    // Only return config if user is authenticated
-    if (req.session.user) {
-        res.json(config.firebase);
+    // Only return config if user is authenticated and is admin
+    if (req.session.user && req.session.user.username === 'admin') {
+        // Return only necessary Firebase config, not all environment variables
+        res.json({
+            apiKey: config.firebase.apiKey,
+            authDomain: config.firebase.authDomain,
+            projectId: config.firebase.projectId
+        });
     } else {
         res.status(401).json({ error: 'Unauthorized' });
     }
