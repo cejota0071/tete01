@@ -181,11 +181,11 @@ header{
 ══════════════════════════════════════════ */
 .products-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(165px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
   gap:1rem;padding:1.25rem;
 }
 .flip-wrapper{
-  perspective:1000px;height:260px;cursor:pointer;
+  perspective:1000px;height:240px;cursor:pointer;
 }
 .flip-inner{
   position:relative;width:100%;height:100%;
@@ -628,7 +628,38 @@ header{
     🛒 Carrinho
     <span class="cart-count" id="cartCount">0</span>
   </button>
+  <a href="login.html" class="admin-btn" title="Painel Admin">
+    <i class="fas fa-cog"></i> Admin
+  </a>
 </header>
+
+<style>
+.admin-btn {
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.admin-btn:hover {
+  background: #5f3dc4;
+  transform: scale(1.04);
+}
+@media (max-width: 480px) {
+  .admin-btn {
+    font-size: 0.8rem;
+    padding: 0.45rem 0.8rem;
+  }
+}
+</style>
 
 <!-- HERO -->
 <div class="hero">
@@ -781,8 +812,8 @@ header{
 const PRODUCTS = [
   {
     id:1, cat:'marmita',
-    name:'Marmita Executiva',
-    price:18.90,
+    name:'Marmita da Vovó',
+    price: 25.00,
     img:'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80',
     desc:'Arroz, feijão, proteína do dia, salada e acompanhamento. Porção caprichada para um almoço completo.',
     macros:['~650kcal','35g prot','Sem glúten'],
@@ -795,7 +826,7 @@ const PRODUCTS = [
     img:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
     desc:'Frango grelhado, arroz integral, legumes refogados e salada verde. Sem fritura, direto ao ponto.',
     macros:['~480kcal','42g prot','Low carb'],
-    status:'green'
+    status:'yellow'
   },
   {
     id:3, cat:'prato',
@@ -804,7 +835,7 @@ const PRODUCTS = [
     img:'https://images.unsplash.com/photo-1598103442097-8b74394b95c8?w=400&q=80',
     desc:'Frango temperado na hora, assado lentamente com ervas. Acompanha farofa crocante e vinagrete.',
     macros:['~720kcal','50g prot','Assado'],
-    status:'green'
+    status:'yellow'
   },
   {
     id:4, cat:'prato',
@@ -822,7 +853,7 @@ const PRODUCTS = [
     img:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=80',
     desc:'Grão-de-bico refogado, arroz integral, legumes da estação e molho tahine caseiro.',
     macros:['~540kcal','22g prot','100% vegano'],
-    status:'green'
+    status:'yellow'
   },
   {
     id:6, cat:'sobremesa',
@@ -831,7 +862,7 @@ const PRODUCTS = [
     img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&q=80',
     desc:'Pudim de leite condensado com calda de caramelo, feito na hora. Receita da vovó.',
     macros:['~320kcal','8g prot','Clássico'],
-    status:'green'
+    status:'yellow'
   },
   {
     id:7, cat:'bebida',
