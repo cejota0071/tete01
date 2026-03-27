@@ -1,20 +1,10 @@
-# QG Marmitas - Task Progress
+# Task: Fix product spacings on small devices + Add login link to admin panel
 
-## ✅ Completed:
-- [x] Restyled index.html modern layout (flip cards, sidebar cart, schedule toggle, status legend)
-- [x] Added img/capa.png to hero background
-- [x] Secured admin toggle with checkAdminAccess (requires /login → /admin)
-- [x] Server localhost:3000 running (nodemon dev, DB admin.db)
-- [x] PWA tags preserved
+## Plan Steps:
+- [x] Step 1: Edit style.css - Improve mobile responsive for products-grid (minmax 220px, add 360px media query, overflow-x:hidden)
+- [x] Step 2: Edit index.html - Fix flip cards mobile (height 240px, minmax 150px), add Admin login button/link to login.html
+- [ ] Step 3: Test responsive on 320px/360px viewports via devtools
+- [ ] Step 4: Confirm admin flow works (index → login → admin)
 
-## 🔄 Next Steps:
-1. Test: localhost:3000 products render, cart add, schedule, WhatsApp
-2. Login: localhost:3000/login (admin / Ju#l1orr@20@) → /admin status panel
-3. Deploy HTTPS production
+**Status:** Completed Step 2, testing now
 
-## Issues Fixed:
-- Port 3000 conflicts (taskkill PID)
-- JS conflicts (old functions.js conditioned)
-- Admin protected (server session)
-
-**Ready for testing!**
